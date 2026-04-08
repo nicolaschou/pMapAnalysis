@@ -2,6 +2,7 @@
 
 Code for analyzing pMap images by computing precursor proportion as a function of distance from mask-defined edges.
 
+
 ## Overview
 
 For each experiment, the pipeline:
@@ -13,6 +14,24 @@ For each experiment, the pipeline:
 - Exports CSVs containing the (distance, proportion) pairs for every pixel
 - Exports a CSV containing the mean proportion per distance across all pMaps
 
+
+## Files
+#### **`pmap_analysis.py`**
+Script that runs the analysis. Defines experiments and parameters, loads data, and runs processing.
+
+#### **`pmap_analysis.ipynb`**
+Jupyter notebook equivalent to `pmap_analysis.py` (does not use multiprocessing).
+
+#### **`parse_pmaps.py`**
+Implements core logic. Detects the edge in the given mask, computes distances from the edge, normalizes pMap values, and provides functions for aggregating and exporting intermediate results.
+
+#### **`format_pmaps.py`**
+Implements image preprocessing. Loads images, converts to grayscale when needed, and applies (optional) cropping.
+
+#### **`export.py`**
+Exports final results (mean proportion values at each depth across all pMaps in an experiment).
+
+
 ## Usage
 
 To take advantage of multiprocessing, use `pmap_analysis.py`. If a Jupyter notebook is preferred, use `pmap_analysis.ipynb`.
@@ -20,6 +39,7 @@ To take advantage of multiprocessing, use `pmap_analysis.py`. If a Jupyter noteb
 2. Add necessary files to the working directory, following the commented structure
 3. Update the file paths and constants in the `get_pix_data` function as necessary
 4. Run the program (if using `pmap_analysis.ipynb`, run the second cell)
+
 
 ## Key Notes
 
