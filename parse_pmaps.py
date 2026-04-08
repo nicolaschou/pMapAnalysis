@@ -9,19 +9,20 @@ def parse_pmap(
         depth: float,
     ):
     """
-    Compute (normalized) pMap intensities at fixed pixel depths from the
-    edge.
+    Compute (normalized) precursor proportions at fixed pixel depths
+    from the edge.
 
     For each edge pixel, the function propagates along four directions
     (up, down, left, right) until a fixed depth. Each pixel is assigned
     to the first edge that reaches it (its nearest edge in the
     four-directional sense). If the pixel lies within the mask and has
-    not been visited by an edge yet, its normalized pmap value is
-    recorded at the corresponding distance.
+    not been visited by an edge yet, its proportion is recorded at the
+    corresponding distance.
 
     Args:
         pmap (np.ndarray): Integer-valued pMap. Normalization assumes
-            the values are scaled to the integer type's maximum.
+            the values are proportions scaled to the integer type's
+            maximum.
         mask (np.ndarray): Binary (grayscale) mask defining the region
             of interest. Zero-valued pixels are considered to be masked
             and positive-valued pixels are considered to be unmasked.
@@ -34,7 +35,7 @@ def parse_pmap(
 
     Returns:
         dict[float, list[float]]: Mapping from distance (microns) to
-            lists of normalized pMap values.
+            lists of precursor proportions.
     """
     H, W = pmap.shape
 
@@ -72,7 +73,7 @@ def parse_pmap(
                     distance_dict[d].append(pmap_norm[r, c])
                     visited[r, c] = True
     
-    # convert back to micron
+    # convert distances back to micron
     pix_to_micron = fov / orig_pix_width
     distance_dict_micron = {
         d * pix_to_micron: values for d, values in distance_dict.items()
@@ -85,23 +86,22 @@ def parse_mask(mask: np.ndarray):
     """Return boolean masks for edge pixels and unmasked pixels."""
     bool_mask = mask > 0 # True where value is unmasked
 
-    # adjacency boolean mask: True where at least one of the 4-adjacent
-    # neighbors is unmasked
+    # True where at least one of the 4-adjacent neighbors is unmasked
     bool_adj = np.zeros_like(bool_mask, dtype=bool)
     bool_adj[1:, :] |= bool_mask[:-1, :]    # up neighbor
     bool_adj[:-1, :] |= bool_mask[1:, :]    # down neighbor
     bool_adj[:, 1:] |= bool_mask[:, :-1]    # left neighbor
     bool_adj[:, :-1] |= bool_mask[:, 1:]    # right neighbor
 
-    # edge boolean mask: True where masked and at least one of the
-    # 4-adjacent neighbors is unmasked
+    # True where masked and at least one of the 4-adjacent neighbors is
+    # unmasked
     bool_edge = ~bool_mask & bool_adj
     
     return bool_edge, bool_mask
 
 
-def mean_intensities(distance_dict: dict):
-    """Compute the mean intensity for each distance key."""
+def mean_proportions(distance_dict: dict):
+    """Compute the mean proportion for each distance key."""
     means = {}  
 
     for distance, values in distance_dict.items():
@@ -116,11 +116,11 @@ def mean_intensities(distance_dict: dict):
 
 
 def dist_csv(distance_dict: dict, csv_path: Path):
-    """Write distance–intensity pairs to a CSV file."""
+    """Write distance–proportion pairs to a CSV file."""
     csv_path.parent.mkdir(parents=True, exist_ok=True)
 
     with csv_path.open("w", newline="") as csvfile:
-        csvfile.write("distance_micron,intensity\n")
+        csvfile.write("distance,proportion\n")
 
         for d, values in distance_dict.items():
             for v in values:

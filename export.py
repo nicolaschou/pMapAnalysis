@@ -2,16 +2,17 @@ from pathlib import Path
 
 def means_csv(mean_dicts: dict, pmap_indices: list, csv_path: Path):
     """
-    Write mean intensity values to a CSV file.
+    Write mean proportion values to a CSV file.
 
     Each column corresponds to a pMap, and each row corresponds to a
     distance/depth value. Entries are taken from `mean_dicts`,
-    which maps pMap indices to dictionaries of {distance: mean_value}.
-    Missing or None values are written as empty fields.
+    which maps pMap indices to dictionaries of
+    {distance: mean_proportion}. Missing or None values are written as
+    empty fields.
 
     Args:
         mean_dicts (dict): {pmap_index: dict} where dict is
-            {distance: mean_value}.
+            {distance: mean_proportion}.
         pmap_indices (list): List of pmap_index keys for mean_dicts.
         csv_path (Path): Path to export CSV to.
     """
